@@ -1,0 +1,6 @@
+export const ADD_FRIEND = 'ADD_FRIEND'
+export const ADD_CART = 'ADD_CART'
+export const CLEAR_CART = 'CLEAR_CART'
+export const GET_USERS = 'GET_USERS'
+export const PLUS_ITEM_CART = 'PLUS_IEM_CART'
+export const REDUCE_ITEM_CART = 'REDUCE_ITEM_CART'

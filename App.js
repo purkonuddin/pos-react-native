@@ -7,6 +7,7 @@ import SecondScreen from './src/SecondScreen';
 import CustomComponent from './src/CustomComponent'; 
 import UsersScreen from './src/UsersScreen'; 
 import CobaScreen from './src/Coba'; 
+import ProductsScreen from './src/ProductsScreen'; 
 import ProfileScreen from './src/ProfileScreen'; 
 import SearchScreen from './src/SearchScreen'; 
 import ItemDetailScreen from './src/secondscreen/ItemRoute/ItemDetailScreen';
@@ -29,6 +30,7 @@ const App = () => {
           <Stack.Screen name="CustomComponent" component={CustomComponent} />
           <Stack.Screen name="UsersScreen" component={UsersScreen} />
           <Stack.Screen name="CobaScreen" component={CobaScreen} />
+          <Stack.Screen name="ProductsScreen" component={ProductsScreen} />
           <Stack.Screen name="SearchScreen" component={SearchScreen} />
           <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
           <Stack.Screen name="ItemDetailScreen" component={ItemDetailScreen} />

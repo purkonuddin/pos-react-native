@@ -38,6 +38,15 @@ function SearchScreen(props) {
             let result = await res.data.result;
             await setProduct(result);
             await setLoading(false);
+            const chart = await Axios.get(`${REACT_APP_URL_STRING}chart/all_users`, {
+              headers: { 
+                'Accept': 'application/json',
+                'Content-Type': 'application/json', 
+              }
+            });
+            console.log('@chart : ', chart.data);
+            
+
         }
     }
 
@@ -57,7 +66,8 @@ function SearchScreen(props) {
     return(
       <>
       <View style={styles.mainContainer}>
-          <View style={styles.headerContainer}> 
+          <View 
+            style={styles.headerContainer}> 
                 <View style={styles.leftHeaderContainer}>
                   <TouchableOpacity  onPress={() => props.navigation.goBack()}>
                     <Icon name="arrow-back" color='#fff' size={23} style={{paddingLeft:10}} />

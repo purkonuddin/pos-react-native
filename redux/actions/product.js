@@ -1,15 +1,7 @@
 import Axios from "react-native-axios";
 import { REACT_APP_URL_STRING } from 'react-native-dotenv';
 import {CLEAR_CART, ADD_CART, PLUS_ITEM_CART, REDUCE_ITEM_CART, REDUCE_CART} from '../types';
-// export const getAllProduct = () => {
-//   return {
-//     type: "GET_PRODUCT", // string yang mendiskripsikan perintah
-//     payload: Axios.get("http://localhost:8080/api/product", {headers: {
-//           "x-access-token": localStorage.getItem("token")
-//         }})
-//   };
-// };
-
+ 
 export const clearCart = () => {
   return {
     type: "CLEAR_CART" 

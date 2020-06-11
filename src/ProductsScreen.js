@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Image, Animated, FlatList, StyleSheet,TouchableOpacity, View, Text, SafeAreaView, ScrollView, Dimensions, RefreshControl, Button, ActivityIndicator }from 'react-native';
+import { ActivityIndicator, Image, Animated, FlatList, StyleSheet,TouchableOpacity, View, Text, SafeAreaView, ScrollView, Dimensions, RefreshControl, Button }from 'react-native';
 import { Header } from 'react-native-elements';
 import TouchableScale from 'react-native-touchable-scale';
 import LinearGradient from 'react-native-linear-gradient';
@@ -14,7 +14,7 @@ import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-m
 const HEADER_HEIGHT = 60
 const MAX_SCROLL_OFFSET = 100
 
-const  CobaScreen = (props) => { 
+const  ProductsScreen = (props) => { 
   const [page, setPage] = React.useState(1);
   const per = 5;
 
@@ -55,8 +55,7 @@ const  CobaScreen = (props) => {
 
   const _handleLoadMore = async() => { 
     if (props.product.pagingProduct.hasNextPages === true) {   
-      await props.dispatch(pagingProducts(next_page, per)); 
-      await console.log('loadingMore...',hasNextPages, next_page,  per);
+      await props.dispatch(pagingProducts(next_page, per));  
     }else{
       await console.log('end of fields',hasNextPages, page, next_page); 
     }
@@ -110,7 +109,7 @@ const  CobaScreen = (props) => {
               }} 
             > 
               <TouchableScale onPress={()=>_handleLoadMore()}>  
-              <Text>Tap to loading more ... {props.product.pagingProduct.hasNextPages === true ? 1 : 0}!</Text> 
+                <Text>Tap to loading more...!</Text> 
               </TouchableScale> 
             </View> 
             )}
@@ -224,7 +223,7 @@ const mapStateToProps =(state)=>{
   }
 }
  
-export default connect(mapStateToProps)(CobaScreen);
+export default connect(mapStateToProps)(ProductsScreen);
 
 const styles = StyleSheet.create({
   container: {

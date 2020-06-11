@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
   Platform,
 } from "react-native";
-import AsyncStorage from '@react-native-community/async-storage';
 const imagedefault = require('./assets/food-and-restaurant.png'); //food-and-restaurant.png
+import AsyncStorage from '@react-native-community/async-storage';
 import { connect } from 'react-redux';
 import { logout } from '../redux/actions/user';
 import Icon from 'react-native-vector-icons/MaterialIcons';

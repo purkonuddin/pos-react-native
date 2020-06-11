@@ -6,11 +6,11 @@ import {cekItemonCart, imgurl, formatNumber} from '../../helper/index';
 const imagedefault = require('../../assets/food-and-restaurant.png');
 import { addToCart } from "../../../redux/actions/product";
 
-const RenderProducts = ({ item, index, props }) => {  
+const RenderProducts = ({index, item, props}) => {   
     let [carts, setCarts] = React.useState(props.product.cart);
     let itemOncartSts = cekItemonCart(carts, item);  
     
-    return(
+    return( 
           <View key={index}>
             <TouchableScale style = {styles.listItemContainer} onPress={()=>props.navigation.navigate('ItemDetailScreen', {item})}>
             <View style= {styles.iconContainer}>
@@ -53,7 +53,7 @@ const RenderProducts = ({ item, index, props }) => {
               </View>
             </View> 
             </TouchableScale>
-          </View>
+          </View> 
   )};
 
 export default RenderProducts;

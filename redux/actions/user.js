@@ -1,12 +1,6 @@
 import { ADD_FRIEND, GET_USERS } from '../types';
 import { REACT_APP_URL_STRING } from 'react-native-dotenv';
-import Axios from 'react-native-axios';
-export const addFriend = friendIndex => (
-  {
-    type: 'ADD_FRIEND',
-    payload: friendIndex,
-  }
-);
+import Axios from 'react-native-axios'; 
 
 export const getUsers = () => (
   {

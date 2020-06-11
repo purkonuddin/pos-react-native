@@ -17,7 +17,7 @@ import { checkout, getCheckout } from "../../redux/actions/checkout";
 import qs from "qs";
 import AsyncStorage from '@react-native-community/async-storage';
 import Overlay from 'react-native-modal-overlay';
-import {wait, formatNumber, countTotal} from '../helper/index'; 
+import {wait, formatNumber, countTotal, imgurl} from '../helper/index'; 
 import Axios from "react-native-axios";
 import { REACT_APP_URL_STRING } from 'react-native-dotenv'; 
 const imagedefault = require('../assets/food-and-restaurant.png');
@@ -25,6 +25,8 @@ import { connect } from "react-redux";
 import { OverlayLoading } from '../helper/index';
 
 const OverlayComponent =(props)=>{ 
+  console.log('@cartitem ',props.product.cart);
+  
   const {visible, onClose } = props;
 
   return(
@@ -216,7 +218,7 @@ const CartRoute = (props) => {
             <>
             <ListItem
             title={item.name} 
-            leftAvatar={{ source: {uri:item.image}}}
+            leftAvatar={{ source: {uri:imgurl(item.image)}}}
             Component={TouchableScale}
             friction={90} //
             tension={60} // These props are passed to the parent component (here TouchableScale)

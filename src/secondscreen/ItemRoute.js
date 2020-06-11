@@ -20,24 +20,37 @@ const ItemsRoute = (props) => {
   const [itemView, setItemView] = React.useState(false);  
   const [loadingMore, setLoadingMore] = React.useState(hasNextPages);
   const [page, setPage] = React.useState(1);
+  const per = 5;
   const [refreshing, setRefreshing] = React.useState(false);
-  const _handleRefresh=async()=>{
-    await setPage(1);
-    await setProducts([]);
-    await setRefreshing(true);
-    await props.dispatch(pagingProducts(1, 5)); 
+  const [viewmodule, setViewmodule] = React.useState(false);
+  const _headerComponent = () =>{
+    return(
+      <View style={{ width:width, flexDirection: 'row', justifyContent:'space-between', paddingHorizontal:10, paddingVertical:10}}>
+      <View>
+        {!props.product.isFulfilled 
+        ? ( <ActivityIndicator size='small' color='orange' />)
+        : ( <Text>{props.product.productData.length} of {props.product.pagingProduct.total}</Text> )}
+      </View>
+      <View> 
+        <TouchableOpacity onPress={() => navigate('ProductsScreen')} style={styles.containerBottomItem} >
+          <Icon name={'view-module'} size={30}/>
+        </TouchableOpacity>
+      </View> 
+    </View>
+    );
   }
 
+  const _keyExtractor = (item, index) => index.toString();
+ 
   const _fetchAllProducts = async() => { 
-    await props.dispatch(pagingProducts(page, 5));
+    await props.dispatch(pagingProducts(page, per));
     await setRefreshing(false); 
   }
 
   const _handleLoadMore = async() => { 
     if (hasNextPages===true) {  
       await setPage(next_page);  
-      await props.dispatch(pagingProducts(next_page, 5));
-    // await _fetchAllProducts();
+      await props.dispatch(pagingProducts(next_page, per)); 
       await console.log('loadingMore...', next_page);
     }else{
       await console.log('end of fields', page, next_page); 
@@ -60,8 +73,7 @@ const ItemsRoute = (props) => {
               alignItems:'center', 
             }} 
           >
-            <Text>Pull top to loading more ...</Text>
-            {/* <ActivityIndicator animating size="large" /> */}
+            <Text>Pull top to loading more ...</Text> 
           </View>
     );
   };
@@ -69,8 +81,6 @@ const ItemsRoute = (props) => {
   const onRefresh = React.useCallback(async()=>{
     await setRefreshing(isRejected);
     await props.dispatch(pagingProducts(page, 5));
-
-    // wait(2000).then(()=> setRefreshing(false));
   },  [refreshing]);
   
   const {navigate} = props.navigation;
@@ -93,7 +103,7 @@ const ItemsRoute = (props) => {
                 <Image
                   source={imagedefault}
                   style={{ width: 50, height: 50 }}
-                  PlaceholderContent={<ActivityIndicator/>}
+                  // PlaceholderContent={<ActivityIndicator/>}
                 />
               </TouchableScale>
             }
@@ -142,39 +152,48 @@ const ItemsRoute = (props) => {
             </SafeAreaView>
           )
           : (
-          <FlatList
-            data={products}
-            ListHeaderComponent={
-              <View style={{ width:width, flexDirection: 'row', justifyContent:'space-between', paddingHorizontal:10, paddingVertical:10}}>
-                <View>
-                  {!props.product.isFulfilled 
-                  ? ( <ActivityIndicator size='small' color='orange' />)
-                  : ( <Text>{products.length} of {props.product.pagingProduct.total}</Text> )}
-                </View>
-                <View>
-                  <TouchableOpacity onPress={() => setItemView(!itemView)} style={styles.containerBottomItem} >
-                    <Icon name={!itemView ? 'view-module' : 'view-list'} size={30}/>
-                  </TouchableOpacity>
-                </View> 
-              </View>
-            }
-            contentContainerStyle={!itemView ? null :{ flexWrap:'wrap',flexDirection:'row', paddingTop:5,paddingBottom:200}}
+            <>
+            {viewmodule ? (
+              <SafeAreaView>
+                <ScrollView 
+                  refreshControl={
+                    <RefreshControl
+                      refreshing={refreshing}
+                      onRefresh={onRefresh}
+                    />
+                  }
+                  contentContainerStyle={{flexWrap:'wrap',flexDirection:'row', paddingTop:5,paddingBottom:200}}
+                  >
+                  {
+                    products.map((item, index) => (
+                      <View key={index} style={{ width:width*50/100, marginTop:25, padding:5}} >
+                      <ItemPreviewCard item={item} props={props} {...props}/>
+                      </View>
+                    ))
+                  }
+                </ScrollView> 
+              </SafeAreaView>
+            ):(
+            <FlatList 
+            style={{flex:0.5}} 
+            ListHeaderComponent={_headerComponent}
             stickyHeaderIndices={[0]} 
-            renderItem={!itemView 
-                        ? ({item, index})=>(<RenderProducts item={item} index={index} props={props} {...props}/>)
-                        : ({item, index}) => (
-                          <View key={index} style={{ width:width*50/100, marginTop:25, padding:5}} >
-                          <ItemPreviewCard item={item} props={props} {...props}/>
-                          </View>
-                        )
-            } 
-            onRefresh={_handleRefresh}
+            data={products}
+            keyExtractor={_keyExtractor} // string
+            renderItem={({ item, index }) => (
+              <RenderProducts item={item} index={index} props={props}/> 
+            )}  
+            onRefresh={onRefresh}
             refreshing={refreshing}
             ListFooterComponent={_renderFooter}
             onEndReached={_handleLoadMore}
             onEndReachedThreshold={1}
             initialNumToRender={5}
-        /> 
+            />
+            )
+              
+            }
+            </>
           )
         }
        

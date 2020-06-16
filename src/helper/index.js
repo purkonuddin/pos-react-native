@@ -43,7 +43,7 @@ export const countTotal =(data)=>{
   
     return total;
 }
-
+/*
 export const OverlayLoading =(props)=>{ 
     const {visible, onClose} = props;
     return(
@@ -68,7 +68,7 @@ export const OverlayLoading =(props)=>{
         </Overlay>
     )
   }  
-  
+*/
 export const getUser = async () => {
     try {
       const value = await AsyncStorage.getItem('USER')

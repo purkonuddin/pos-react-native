@@ -6,11 +6,9 @@ import LinearGradient from 'react-native-linear-gradient';
 import TouchableScale from 'react-native-touchable-scale';
 import {
   Menu,
-  MenuProvider,
   MenuOptions,
   MenuOption,
   MenuTrigger,
-  renderers,
 } from 'react-native-popup-menu';
 import { clearCart, reduceCart, plusItemOnCart, reduceItemOnCart} from "../../redux/actions/product";
 import { checkout, getCheckout } from "../../redux/actions/checkout"; 
@@ -22,10 +20,8 @@ import Axios from "react-native-axios";
 import { REACT_APP_URL_STRING } from 'react-native-dotenv'; 
 const imagedefault = require('../assets/food-and-restaurant.png');
 import { connect } from "react-redux";
-import { OverlayLoading } from '../helper/index';
 
-const OverlayComponent =(props)=>{ 
-  console.log('@cartitem ',props.product.cart);
+const OverlayComponent =(props)=>{  
   
   const {visible, onClose } = props;
 
@@ -33,7 +29,7 @@ const OverlayComponent =(props)=>{
     <Overlay 
         visible={visible} 
         onClose={onClose} 
-        closeOnTouchOutside 
+        closeOnTouchOutside={false}
         animationType="zoomIn" 
         containerStyle={{backgroundColor: 'rgba(37, 8, 10, 0.78)'}}
         childrenWrapperStyle={{backgroundColor: '#FFF', borderRadius:16, borderWidth:3, borderColor:'#FFF'}}
@@ -42,9 +38,11 @@ const OverlayComponent =(props)=>{
           (hideModal, overlayState) => (
             <Fragment> 
                 <View style={{alignSelf:'stretch'}}>
+                  {!props.checkout.isFulfilled ? (<ActivityIndicator/>):null}
                   <Text style={{fontWeight:'bold'}}>Checkout</Text>
                   <Text style={{position:'absolute', top:3, right:3}} onPress={hideModal}>Close</Text>
                 </View>
+                
                 {props.checkout.checkoutData.length === 0?(
                   <View>
                     <Icon name='shopping-basket' size={100} color='pink'/> 
@@ -187,6 +185,8 @@ const CartRoute = (props) => {
         <View style={styles.container}>
           <Icon name='shopping-basket' size={100} color='pink'/>
           <Text>Keranjang belanja kosong</Text>
+          <Text>atau</Text>
+          <Text>Klik menu <Icon name='done-all' size={20}/>checkout untuk melihat transaksi terakhir</Text>
         </View>
       } 
       <View> 

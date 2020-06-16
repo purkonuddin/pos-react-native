@@ -1,5 +1,5 @@
 import React from 'react';
-import {ScrollView, ActivityIndicator, View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions, RefreshControl } from 'react-native';
+import {Animated, ScrollView, ActivityIndicator, View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions, RefreshControl } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Header, Image } from 'react-native-elements';
 import LinearGradient from 'react-native-linear-gradient'; 
@@ -12,7 +12,12 @@ import RenderProducts from './ItemRoute/RenderProducts';
 import { SafeAreaView } from 'react-native-safe-area-context';
 const {height, width}= Dimensions.get('window'); 
 
+const HEADER_HEIGHT = 60
+const MAX_SCROLL_OFFSET = 100
+
 const ItemsRoute = (props) => {  
+  const [scrollY, setScrollY] =React.useState(new Animated.Value(0));
+
   const [isRejected, setIsRejected] = React.useState(props.product.isRejected);
   const [hasNextPages, setHasNextPages] = React.useState(props.product.pagingProduct.hasNextPages);
   let [products, setProducts] = React.useState(props.product.productData);
@@ -82,11 +87,123 @@ const ItemsRoute = (props) => {
     await setRefreshing(isRejected);
     await props.dispatch(pagingProducts(page, 5));
   },  [refreshing]);
+
+  const translateDiffScroll = Animated.diffClamp(scrollY, 0, MAX_SCROLL_OFFSET).interpolate({
+    inputRange: [0, MAX_SCROLL_OFFSET],
+    outputRange: [0, -HEADER_HEIGHT],
+    extrapolate: 'clamp'  
+  })
   
   const {navigate} = props.navigation;
 
-  return(
-    <> 
+  return( 
+    <Animated.View style={{flex: 1, paddingTop:0}}>  
+      {/* <Animated.ScrollView
+          onScroll={Animated.event(
+            [
+              {
+                nativeEvent: {
+                  contentOffset: { y: scrollY }
+                }
+              }
+            ],
+            { useNativeDriver: true } // <-- Add this
+          )}
+          contentContainerStyle={{flexWrap:'wrap',flexDirection:'row', paddingVertical:60}}
+      >  */}
+      {/* content here */}
+      {/* <FlatList 
+            style={{flex:0.5}} 
+            ListHeaderComponent={_headerComponent}
+            stickyHeaderIndices={[0]} 
+            data={products}
+            keyExtractor={_keyExtractor} // string
+            renderItem={({ item, index }) => (
+              <RenderProducts item={item} index={index.toString()} props={props}/> 
+            )}  
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+            ListFooterComponent={_renderFooter}
+            onEndReached={_handleLoadMore}
+            onEndReachedThreshold={1}
+            initialNumToRender={5}
+            /> */}
+      {/* end content here */}
+      {/* </Animated.ScrollView>
+      <Animated.View 
+          style={{ 
+            position: 'absolute', 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            backgroundColor: '#1136F2', 
+            transform: [{translateY: translateDiffScroll}] 
+          }} 
+      > */}
+        {/* header */}
+        {/* <Header
+            ViewComponent={LinearGradient} // Don't forget this!
+            linearGradientProps={{
+              colors: ['#fff','pink', 'orange', '#f44336'],
+              start: { x: 0.5, y: 0.5 },
+              end: { x: 1, y: 1 },
+            }}
+            placement="left"
+            leftComponent={
+              <TouchableScale
+                onPress={() => navigate('CustomComponent', {user:props.user.loginData})}
+                style={styles.containerBottomItem}
+              > 
+                <Image
+                  source={imagedefault}
+                  style={{ width: 50, height: 50 }}
+                  // PlaceholderContent={<ActivityIndicator/>}
+                />
+              </TouchableScale>
+            }
+            statusBarProps={{ barStyle: 'light-content' }}
+            barStyle="light-content" // or directly 
+            centerComponent={ 
+              { text: 'Point Of Sales', style: { color: 'grey', fontWeight:'bold', fontSize:18 } }
+            }  
+            centerContainerStyle={{flex:1}} 
+            rightComponent={
+              <View style={styles.rightHeaderContainer}>
+              <TouchableScale onPress={()=>navigate('SearchScreen')}> 
+                <View> 
+                  <Icon name={'search'} color='#fff' size={30} style={{paddingVertical:5}}/>
+                </View>
+              </TouchableScale>
+              <TouchableOpacity> 
+                <Menu>
+                  <MenuTrigger style={styles.menuTrigger} > 
+                    <Icon name="more-vert" color='#fff' size={30} style={{padding:5}}/>
+                  </MenuTrigger>
+                  <MenuOptions>
+                    <MenuOption onSelect={() => navigate('UsersScreen')} style={{flexDirection:'row'}}>
+                      <Icon name="people" color='#666' size={23}/><Text>Users</Text>
+                      </MenuOption>
+                      <MenuOption onSelect={() => navigate('CustomComponent',{user:props.user.loginData})} style={{flexDirection:'row'}}>
+                      <Icon name="menu" color='#666' size={23}/><Text>Menu</Text>
+                    </MenuOption>
+                  </MenuOptions>
+                </Menu>
+              </TouchableOpacity>
+              </View>
+            }
+            containerStyle={{
+              height: HEADER_HEIGHT,
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              paddingHorizontal: 20,
+              paddingVertical:20
+            }}
+            // containerStyle={{ backgroundColor: '#FFF', justifyContent: 'space-around', height:70, marginTop:0, paddingTop:0, }}
+        />  */}
+        {/* end header */}
+      {/* </Animated.View> */}
+      {/* end animated */}
+      
       <Header
             ViewComponent={LinearGradient} // Don't forget this!
             linearGradientProps={{
@@ -196,8 +313,9 @@ const ItemsRoute = (props) => {
             </>
           )
         }
+        
        
-    </>
+    </Animated.View> 
   );  
 };
 

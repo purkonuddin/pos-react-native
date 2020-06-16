@@ -20,9 +20,12 @@ const ItemDetailScreen=(props)=> {
     let [loading, setLoading] = useState(false);
 
     const _handleAddtoCart =async(item)=> {
-       await setLoading(itemOncartSts);
-       await props.dispatch(addToCart(item));
-       await setLoading(itemOncartSts);
+        if (item.stock > 0) {
+            await setLoading(itemOncartSts);
+            await props.dispatch(addToCart(item));
+            await setLoading(itemOncartSts);
+        }
+       
     }
 
     return(
@@ -103,7 +106,7 @@ const ItemDetailScreen=(props)=> {
         </View>
         <View style={{marginBottom:10,marginHorizontal:10,borderWidth:1,borderColor:'#666',borderRadius:16,zIndex:100, flexDirection:'column', paddingVertical:5, backgroundColor:'#FFF'}}>
             <View style={{alignSelf:'center', alignItems:'center',justifyContent: 'center',}}>
-                <Text style={{ fontWeight:'bold',color:'#666'}}>Item berdasarkan Category ></Text>
+                <Text style={{ fontWeight:'bold',color:'#666'}}>Item berdasarkan Category </Text>
             </View>
             <ScrollView horizontal>
             {/* <View style={{ flex:1 ,flexDirection:'row',alignItems:'flex-start', width:width, height:300}}> */}

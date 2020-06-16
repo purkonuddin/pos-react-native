@@ -1,14 +1,14 @@
 // @observer
-import React, {Component, useState} from 'react';
-import {ActivityIndicator, View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions } from 'react-native';
+import React, {Component} from 'react';
+import {StatusBar, Text, StyleSheet, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { SearchBar, Header, Image, ListItem } from 'react-native-elements';
+import { SearchBar } from 'react-native-elements';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { connect } from "react-redux";
 import { pagingProducts } from "../redux/actions/product";
-import { getChartUser, getCharts } from "../redux/actions/chart";
+import { getCharts } from "../redux/actions/chart";
 import { getUsers} from "../redux/actions/user";
-import ItemsRoute from './secondscreen/ItemRoute'; //'./Coba';//
+import ItemsRoute from './secondscreen/ItemRoute'; 
 import HomeRoute from './secondscreen/HomeRoute';
 import CartRoute from './secondscreen/CartRoute';
 
@@ -74,17 +74,12 @@ class SecondScreen extends Component {
     await this.props.dispatch(getCharts());
   }; 
 
-  getchartuser = async () => {
-    // const [user, setUser] = useState(props.user.loginData[0]); 
-    await this.props.dispatch(getChartUser(this.props.user.loginData[0].id));
-  }; 
- 
   componentDidMount(){
     const {page} = this.state.page;
     this.getProduct(page,10); 
     this.getUser(); 
     this.getChart();
-    this.getchartuser();
+    // this.getchartuser();
   }
 
   render() {  
@@ -117,6 +112,7 @@ class SecondScreen extends Component {
     
     return ( 
       <>
+        <StatusBar barStyle={'light-content'} backgroundColor={'#f44336'}/>
           <TabView
             containerStyle={{backgroundColor:'#FFF'}}
             navigationState={this.state}

@@ -1,12 +1,12 @@
-import React, {Component, Fragment} from 'react';
+import React, {Component} from 'react';
 import { ActivityIndicator, TouchableOpacity, Image, View,Text,TextInput, StyleSheet, Button, Dimensions, Alert, ScrollView} from 'react-native';
 import { connect } from 'react-redux';
 import TouchableScale from 'react-native-touchable-scale';
 import { login } from '../redux/actions/user';
 import AsyncStorage from '@react-native-community/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
-const imagedefault = require('./assets/food-and-restaurant.png'); //food-and-restaurant.png
-import { OverlayLoading } from './helper/index'; 
+const imagedefault = require('./assets/food-and-restaurant.png');
+import { OverlayLoading } from './component/OverlayLoading'; 
 import Axios from "react-native-axios";
 import { REACT_APP_URL_STRING } from 'react-native-dotenv';
 
@@ -28,7 +28,7 @@ class FirstScreen extends Component {
     if (id !== '' && email != '') { 
         const res = await Axios.post(`${REACT_APP_URL_STRING}email/lupa_password?id=${id}&email=${email}`);
         let result = await res.data; 
-        console.log(result);
+        // console.log(result);
         
         Alert.alert( 
           `Sending email: Code ${result.code}`,
@@ -62,7 +62,7 @@ class FirstScreen extends Component {
         await this.props.navigation.navigate('SecondScreen');
       }
     } catch(e) {
-      console.log(e);
+      // console.log(e);
       await this.toggleLoading();
     }
   }
@@ -81,7 +81,7 @@ class FirstScreen extends Component {
   render() {   
     const {errMsg, isFulfilled, loginData} = this.props.user;  
     let userdata = Array.isArray(loginData); 
-    console.log(this.state.loading, loginData.length === 0);
+    // console.log(this.state.loading, loginData.length === 0);
     
     if (isFulfilled === true && loginData.length > 0) {  
       this.props.navigation.navigate('SecondScreen');

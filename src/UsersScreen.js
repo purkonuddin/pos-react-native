@@ -1,24 +1,27 @@
 import React, {useState} from 'react';
-import { RefreshControl, SafeAreaView, Dimensions, ActivityIndicator, FlatList, View, Image, TouchableOpacity, StyleSheet, Text, ListView, AppRegistry } from 'react-native';
+import { RefreshControl, Dimensions, ActivityIndicator, FlatList, View, Image, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import LinearGradient from 'react-native-linear-gradient';
-import { ListItem, Header, Avatar, SearchBar } from 'react-native-elements';
-import TouchableScale from 'react-native-touchable-scale'; // https://github.com/kohver/react-native-touchable-scale
+// import LinearGradient from 'react-native-linear-gradient';
+import { SearchBar } from 'react-native-elements';
 import {
   Menu,
-  MenuProvider,
   MenuOptions,
   MenuOption,
   MenuTrigger,
-  renderers,
 } from 'react-native-popup-menu';
-import { Axios } from 'react-native-axios';
 import {connect} from 'react-redux';
 import {getUsers} from '../redux/actions/user';
 const {width, height} = Dimensions.get("window");
 import { imgurl } from './helper/index'; 
+import { getChartUser } from "../redux/actions/chart";
 
 const UserListItem=({ item, props })=>{ 
+  const _handleprofiledetail=async()=>{
+    await props.navigation.navigate('ProfileScreen', {item});
+    await props.dispatch(getChartUser(item.id));
+
+  }
+
   return(
      <View style = {styles.listItemContainer}>
               <View style= {styles.iconContainer}>
@@ -35,7 +38,7 @@ const UserListItem=({ item, props })=>{
                         <Icon name="more-horiz" color='green' size={23} style={{padding:5}}/>
                       </MenuTrigger>
                       <MenuOptions style={{padding:10, flexDirection:'column', justifyContent:'space-around'}}>
-                        <MenuOption onSelect={() => props.navigation.navigate('ProfileScreen', {item})} style={{flexDirection:'row'}}>
+                        <MenuOption onSelect={() => _handleprofiledetail()} style={{flexDirection:'row'}}>
                           <Icon name="account-box" color='green' size={23}/><Text>detail</Text>
                         </MenuOption> 
                       </MenuOptions>

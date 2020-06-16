@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { ActivityIndicator, Image, Animated, FlatList, StyleSheet,TouchableOpacity, View, Text, SafeAreaView, ScrollView, Dimensions, RefreshControl, Button }from 'react-native';
+import React from 'react';
+import { Image, Animated, StyleSheet,TouchableOpacity, View, Text, ScrollView, Dimensions, RefreshControl, Button }from 'react-native';
 import { Header } from 'react-native-elements';
 import TouchableScale from 'react-native-touchable-scale';
 import LinearGradient from 'react-native-linear-gradient';
@@ -8,7 +8,6 @@ import { connect } from 'react-redux';
 import ItemPreviewCard from './secondscreen/ItemRoute/ItemPreviewCard';
 const {height, width}= Dimensions.get('window'); 
 import RenderProducts from './secondscreen/ItemRoute/RenderProducts';
-import { wait } from './helper/index'; 
 import { pagingProducts } from '../redux/actions/product';
 import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 const HEADER_HEIGHT = 60
@@ -60,7 +59,7 @@ const  ProductsScreen = (props) => {
       await console.log('end of fields',hasNextPages, page, next_page); 
     }
   }; 
-  console.log(props.user.loginData);
+  // console.log(props.user.loginData);
   
   return(
     // paddingTop: headerHeight

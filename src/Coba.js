@@ -1,220 +1,266 @@
-import React, { useRef } from 'react';
-import { Image, Animated, FlatList, StyleSheet,TouchableOpacity, View, Text, SafeAreaView, ScrollView, Dimensions, RefreshControl, Button, ActivityIndicator }from 'react-native';
-import { Header } from 'react-native-elements';
-import TouchableScale from 'react-native-touchable-scale';
-import LinearGradient from 'react-native-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialIcons'; 
+import React, {Component} from 'react';
+/*redux */
 import { connect } from 'react-redux';
-import ItemPreviewCard from './secondscreen/ItemRoute/ItemPreviewCard';
-const {height, width}= Dimensions.get('window'); 
-import RenderProducts from './secondscreen/ItemRoute/RenderProducts';
-import { wait } from './helper/index'; 
-import { pagingProducts } from '../redux/actions/product';
-import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
-const HEADER_HEIGHT = 60
-const MAX_SCROLL_OFFSET = 100
+/*Components*/
+import {Animated, View, StatusBar, Text, Image, Platform, Linking, TouchableOpacity} from 'react-native';
+import MaterialAnimatedView from './component/MaterialAnimation';
+import Icons from "react-native-vector-icons/MaterialCommunityIcons";
+/*utils*/
+import styles from './style';
+import {ThemeUtils, Color} from './utils';
+import { imgurl } from './helper/index';   
+/*Data*/
+import coverImage from './assets/images/food-and-restaurant.png';
+import profileImage from './assets/images/food-and-restaurant.png';
 
-const  CobaScreen = (props) => { 
-  const [page, setPage] = React.useState(1);
-  const per = 5;
+const ARTIST_NAME = 'Bob Marley';
 
-  const [hasNextPages, setHasNextPages] = React.useState(props.product.pagingProduct.hasNextPages);
-  const [next_page, setNext_page] = React.useState(hasNextPages ? props.product.pagingProduct.next_page : 1);
-  
-  // animasi library
-  const [scrollY, setScrollY] =React.useState(new Animated.Value(0));
+class CobaScreen extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+        scrollY: new Animated.Value(0),
+        products:this.props.product.pagingProduct.data
+    };
+  }
 
-  const headerTranslate = scrollY.interpolate({
-    inputRange: [0, MAX_SCROLL_OFFSET],
-    outputRange: [0, -HEADER_HEIGHT],
-    extrapolate: 'clamp',  // clamp so translateY can’t go beyond MAX_SCROLL_OFFSET
-  })
+  //artist profile image position from left
+  _getImageLeftPosition = () => {
+    const {scrollY} = this.state;
 
-  const headerHeight = scrollY.interpolate({
-      inputRange: [0, MAX_SCROLL_OFFSET],
-      outputRange: [2 * HEADER_HEIGHT, HEADER_HEIGHT],
-      extrapolate: 'clamp',
-      useNativeDriver: true
-  })
+    return scrollY.interpolate({
+        inputRange: [0, 80, 140],
+        outputRange: [ThemeUtils.relativeWidth(30), ThemeUtils.relativeWidth(38), ThemeUtils.relativeWidth(10)],
+        extrapolate: 'clamp',
+        // useNativeDriver: true
+    });
+  };
 
-  const translateDiffScroll = Animated.diffClamp(scrollY, 0, MAX_SCROLL_OFFSET).interpolate({
-      inputRange: [0, MAX_SCROLL_OFFSET],
-      outputRange: [0, -HEADER_HEIGHT],
-      extrapolate: 'clamp'  
-  })
- 
-  let [products, setProducts] = React.useState(props.product.productData);
-  const { navigate } = props.navigation;
-  const [refreshing, setRefreshing] = React.useState(false);
-  const [isRejected, setIsRejected] = React.useState(props.product.isRejected);
-  
-  const _handleRefresh=React.useCallback(async()=>{
-    await setRefreshing(isRejected);
-    await props.dispatch(pagingProducts(page, per));   
-  },  [refreshing]);
+  //artist profile image position from top
+  _getImageTopPosition = () => {
+      const {scrollY} = this.state;
 
-  const _handleLoadMore = async() => { 
-    if (props.product.pagingProduct.hasNextPages === true) {   
-      await props.dispatch(pagingProducts(next_page, per)); 
-      await console.log('loadingMore...',hasNextPages, next_page,  per);
-    }else{
-      await console.log('end of fields',hasNextPages, page, next_page); 
-    }
-  }; 
-  console.log(props.user.loginData);
-  
-  return(
-    // paddingTop: headerHeight
-    <Animated.View style={{flex: 1, paddingTop:60}}> 
-        <Animated.ScrollView
-          onScroll={Animated.event(
-            [
-              {
-                nativeEvent: {
-                  contentOffset: { y: scrollY }
-                }
-              }
-            ],
-            { useNativeDriver: true } // <-- Add this
-          )} 
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={_handleRefresh}
-            />
-          }
-          contentContainerStyle={{flexWrap:'wrap',flexDirection:'row', paddingVertical:60}}
-          
-          > 
-          <>
-            {
-              props.product.productData.map((item, index) => (
-                <View key={index} style={{ width:width*50/100, marginTop:25, padding:5}} >
-                <ItemPreviewCard item={item} props={props} {...props}/>
-                </View>
-              ))
-            } 
-            <>
-            {props.product.pagingProduct.hasNextPages === true && (
-            <View 
-              style={{ 
-                position: 'relative', 
-                width: width, 
-                height:100, 
-                paddingVertical: 20, 
-                borderTopWidth: 0, 
-                marginTop: 10, 
-                marginBottom: 10, 
-                borderColor: 'pink',
-                alignItems:'center', 
-              }} 
-            > 
-              <TouchableScale onPress={()=>_handleLoadMore()}>  
-              <Text>Tap to loading more ... {props.product.pagingProduct.hasNextPages === true ? 1 : 0}!</Text> 
-              </TouchableScale> 
-            </View> 
-            )}
-            </>
-          </>
-        </Animated.ScrollView>
-        <Animated.View 
-          style={{ 
-            position: 'absolute', 
-            top: 0, 
-            left: 0, 
-            right: 0, 
-            backgroundColor: '#1136F2', 
-            transform: [{translateY: translateDiffScroll}] 
-          }} 
-        >
-            <Header
-            ViewComponent={LinearGradient} // Don't forget this!
-            linearGradientProps={{
-              colors: ['#fff','pink', 'orange', '#f44336'],
-              start: { x: 0.5, y: 0.5 },
-              end: { x: 1, y: 1 },
-            }}
-            placement="left"
-            leftComponent={
-              <TouchableOpacity
-                onPress={() => {}}
-                style={styles.containerBottomItem}
-              > 
-                <Image
-                  source={require('./assets/food-and-restaurant.png')}
-                  style={{ width: 50, height: 50 }} 
-                />
-              </TouchableOpacity>
-            }
-            statusBarProps={{ barStyle: 'light-content' }}
-            barStyle="light-content" // or directly 
-            centerComponent={ 
-              { text: 'Point Of Sales', style: { color: 'grey', fontWeight:'bold', fontSize:18 } }
-            }  
-            centerContainerStyle={{flex:1}} 
-            rightComponent={
-              <View style={{
-                alignItems: "flex-end",
-                flexDirection: "row"
-              }}>
-              <TouchableOpacity onPress={()=>navigate('SearchScreen')}> 
-                <View> 
-                  <Icon name={'search'} color='#fff' size={30} style={{paddingVertical:5}}/>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity> 
-                <Menu>
-                  <MenuTrigger style={styles.menuTrigger} > 
-                    <Icon name="more-vert" color='#fff' size={30} style={{padding:5}}/>
-                  </MenuTrigger>
-                  <MenuOptions>
-                    <MenuOption onSelect={() => navigate('UsersScreen')} style={{flexDirection:'row'}}>
-                      <Icon name="people" color='#666' size={23}/><Text>Users</Text>
-                      </MenuOption>
-                      <MenuOption onSelect={() => navigate('CustomComponent',{user:props.user.loginData})} style={{flexDirection:'row'}}>
-                      <Icon name="menu" color='#666' size={23}/><Text>Menu</Text>
-                    </MenuOption>
-                  </MenuOptions>
-                </Menu>
-              </TouchableOpacity>
+      return scrollY.interpolate({
+          inputRange: [0, 140],
+          outputRange: [ThemeUtils.relativeHeight(20), Platform.OS === 'ios' ? 8 : 10],
+          extrapolate: 'clamp',
+          // useNativeDriver: true
+      });
+  };
+
+  //artist profile image width
+  _getImageWidth = () => {
+    const {scrollY} = this.state;
+
+    return scrollY.interpolate({
+        inputRange: [0, 140],
+        outputRange: [ThemeUtils.relativeWidth(40), ThemeUtils.APPBAR_HEIGHT - 20],
+        extrapolate: 'clamp',
+        // useNativeDriver: true
+    });
+  };
+
+  //artist profile image height
+  _getImageHeight = () => {
+    const {scrollY} = this.state;
+
+    return scrollY.interpolate({
+        inputRange: [0, 140],
+        outputRange: [ThemeUtils.relativeWidth(40), ThemeUtils.APPBAR_HEIGHT - 20],
+        extrapolate: 'clamp',
+        // useNativeDriver: true
+    });
+  };
+
+  renderArtistCard=(index, item)=>{
+    return (
+      <MaterialAnimatedView key={index.toString()} index={index}>
+          <TouchableOpacity activeOpacity={0.8} style={styles.artistCardContainerStyle}
+                            onPress={() => this.openLink(imgurl(item.image))}>
+              <Image source={{uri: imgurl(item.image)}} style={styles.artistImage}/>
+              <View style={styles.cardTextContainer}>
+                  <Text numberOfLines={1} style={styles.songTitleStyle}>{item.name}</Text>
+                  <Text numberOfLines={1}>{item.description}</Text>
               </View>
-            }
-            containerStyle={{
-              height: HEADER_HEIGHT,
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              paddingHorizontal: 20,
-              paddingVertical:20
-            }}
-          /> 
-          {/* </View> */}
-          <View style={{
-            height: HEADER_HEIGHT,
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            paddingHorizontal: 20,
-            backgroundColor:'#ed788b'
-          }}>
-            <View style={styles.tabContainer}>
-            <TouchableOpacity onPress={() => navigate('CustomComponent', {user:props.user.loginData})} style={styles.title} >
-              <Icon style={styles.title} name="menu"/> 
-            </TouchableOpacity>
+          </TouchableOpacity>
+      </MaterialAnimatedView>
+    )
+  }
+
+  openLink=(url)=>{
+    Linking.canOpenURL(url)
+    .then((supported) => {
+        if (!supported) {
+            console.log("Can't handle url: " + url);
+        } else {
+            return Linking.openURL(url);
+        }
+    })
+    .catch((err) => console.error('An error occurred', err));
+  }
+
+  //For header image opacity
+  _getHeaderImageOpacity = () => {
+    const {scrollY} = this.state;
+
+    return scrollY.interpolate({
+        inputRange: [0, 140],
+        outputRange: [1, 0],
+        extrapolate: 'clamp',
+        // useNativeDriver: true
+    });
+  };
+
+  //For header background color from transparent to header color
+  _getHeaderBackgroundColor = () => {
+    const {scrollY} = this.state;
+
+    return scrollY.interpolate({
+        inputRange: [0, 140],
+        outputRange: ['rgba(0,0,0,0.0)', Color.HEADER_COLOR],
+        extrapolate: 'clamp',
+        // useNativeDriver: true
+    });
+  };
+
+  //header title opacity
+  _getHeaderTitleOpacity = () => {
+    const {scrollY} = this.state;
+
+    return scrollY.interpolate({
+        inputRange: [0, 20, 50],
+        outputRange: [0, 0.5, 1],
+        extrapolate: 'clamp',
+        // useNativeDriver: true
+    });
+  };
+
+  //artist name opacity
+  _getNormalTitleOpacity = () => {
+    const {scrollY} = this.state;
+
+    return scrollY.interpolate({
+        inputRange: [0, 20, 50],
+        outputRange: [1, 0.5, 0],
+        extrapolate: 'clamp',
+        // useNativeDriver: true
+    });
+
+  };
+
+  //Song list container position from top
+  _getListViewTopPosition = () => {
+    const {scrollY} = this.state;
+
+    return scrollY.interpolate({
+        inputRange: [0, 250],
+        outputRange: [ThemeUtils.relativeWidth(100) - ThemeUtils.APPBAR_HEIGHT - 10, 0],
+        extrapolate: 'clamp',
+        // useNativeDriver: true
+    });
+  };
+
+  render() {
+    const normalTitleOpacity = this._getNormalTitleOpacity();
+    const headerTitleOpacity = this._getHeaderTitleOpacity();
+    const headerBackgroundColor = this._getHeaderBackgroundColor();
+    const headerImageOpacity = this._getHeaderImageOpacity();
+    const profileImageLeft = this._getImageLeftPosition();
+    const profileImageTop = this._getImageTopPosition();
+    const profileImageWidth = this._getImageWidth();
+    const profileImageHeight = this._getImageHeight();
+    const listViewTop = this._getListViewTopPosition();
+    const {products} = this.state; 
+    
+    return(
+      <Text>{'Coba Animated ...'}</Text>
+      /*
+      <Animated.View style={styles.container}>
+        <StatusBar barStyle={'light-content'} backgroundColor={Color.STATUSBAR_COLOR}/>
+          <Animated.Image
+            style={[styles.headerImageStyle, {
+                opacity: headerImageOpacity,
+
+            }]}
+            source={coverImage}
+          />
+
+          <Animated.View style={[styles.headerStyle, {
+              backgroundColor: headerBackgroundColor,
+          }]}>
+            <View style={styles.headerLeftIcon}>
+              <Icons name={"arrow-left"} size={25} color={Color.HEADER_BACK_ICON_COLOR}/>
             </View>
-            <View style={styles.line} />
-            <View style={styles.tabContainer}>
-            <Icon style={styles.title}  name='local-grocery-store'/>
-            <Text style={{position:'absolute', color: 'orange', right:59, top:21, fontSize:10, fontWeight:'bold'}}>{props.product.cart.length}</Text>
+
+            <View style={styles.headerRightIcon}>
+                <Icons name={"settings"} size={25} color={Color.HEADER_BACK_ICON_COLOR}/>
             </View>
-            <View style={styles.line} />
-            <View style={styles.tabContainer}>
-            <TouchableOpacity onPress={() => props.navigation.goBack()} style={styles.title} >
-              <Icon style={{color:'#fff'}} name={'view-module'} size={30}/>
-            </TouchableOpacity>
-            </View>
-          </View>
-        </Animated.View>
+
+            <Animated.Text
+                style={[styles.headerTitle, {
+                    opacity: headerTitleOpacity
+                }]}>
+                {ARTIST_NAME}
+            </Animated.Text>
+          </Animated.View>
+
+          <Animated.Image
+            style={
+                [styles.profileImage, {
+                borderRadius: (ThemeUtils.APPBAR_HEIGHT - 20) / 2,
+                height: profileImageHeight,
+                width: profileImageWidth,
+                transform: [
+                       {translateY: profileImageTop},
+                       {translateX: profileImageLeft}
+                    ]
+                }]}
+                source={profileImage}
+          />
+
+          <Animated.ScrollView
+            overScrollMode={'never'}
+            style={{zIndex: 10}}
+            scrollEventThrottle={16}
+            onScroll={Animated.event(
+                [
+                    {
+                        nativeEvent: {contentOffset: {y: this.state.scrollY}}
+                    }
+                ],
+                {useNativeDriver:true}
+            )}>
+          
+            <Animated.Text style={[
+              styles.profileTitle, {
+                opacity: normalTitleOpacity,
+              }
+            ]}
+            >
+              {ARTIST_NAME}
+            </Animated.Text>
+
+            <Animated.Text style={[
+              styles.songCountStyle, {
+                opacity: normalTitleOpacity,
+              }
+            ]}>
+              {`♬ ${products.length} songs`}
+            </Animated.Text>
+
+            <Animated.ScrollView style={{
+              transform: [{
+                translateY: listViewTop
+              }],
+            }}> 
+              {products.map((item, index) => this.renderArtistCard(index, item))}
+            </Animated.ScrollView>
+
+          </Animated.ScrollView>
       </Animated.View>
-  )
+      */
+    );
+  }
 }
 
 const mapStateToProps =(state)=>{
@@ -225,49 +271,3 @@ const mapStateToProps =(state)=>{
 }
  
 export default connect(mapStateToProps)(CobaScreen);
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
-  header: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#1136F2'
-  },
-  headerContainer: {
-    height: HEADER_HEIGHT,
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    paddingHorizontal: 20,
-    backgroundColor:'#ed788b'
-  },
-  listContainer: {
-    marginBottom: 5,
-    marginTop: 0
-  },
-  tabContainer: {
-    flex: 1,
-    paddingVertical: 20
-  },
-  iconContainer: {
-    alignSelf: 'center'
-  },
-  line: {
-    borderLeftWidth: 1.5,
-    borderColor: '#FFF',
-    marginVertical: 18
-  },
-  icon: {
-    color: '#FFF',
-    fontSize: 18
-  },
-  title: {
-    color: '#FFF',
-    fontSize: 25,
-    flex: 1,
-    alignSelf: 'center'
-  }
-})

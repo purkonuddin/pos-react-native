@@ -1,16 +1,44 @@
 import React, {Fragment, useState} from 'react';
-import { Button, SafeAreaView, Dimensions, ScrollView, ActivityIndicator, FlatList, View, TouchableOpacity, StyleSheet, Text, Alert } from 'react-native';
+import { Dimensions, ScrollView, ActivityIndicator, View, TouchableOpacity, StyleSheet, Text, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { SearchBar, Header, Image, Avatar } from 'react-native-elements';
-import { Menu, MenuProvider, MenuOptions, MenuOption, MenuTrigger, renderers, } from 'react-native-popup-menu';
+import { Header, Image, Avatar } from 'react-native-elements';
+import { Menu, MenuOptions, MenuOption, MenuTrigger } from 'react-native-popup-menu';
 import { LineChart } from "react-native-chart-kit";
 const imagedefault = require('./assets/food-and-restaurant.png');
 const {height, width}= Dimensions.get('window');
-import {imgurl} from './helper/index'; 
+import {imgurl, wait, formatNumber} from './helper/index'; 
 import Overlay from 'react-native-modal-overlay';
-import ImagePicker from 'react-native-image-picker'; 
+import ImagePicker from 'react-native-image-picker';  
+import { connect } from "react-redux";
  
 function ProfileScreen(props) { 
+
+    const [myincome_today, setMyincome_today] = useState(props.chart.chartDataUser.myIncome_today | 0); 
+    const [myincome_week, setMyincome_week] = useState(props.chart.chartDataUser.myIncome_thisweek | 0); 
+    const [myincome_month, setMyincome_month] = useState(props.chart.chartDataUser.myIncome_thismonth | 0); 
+    const [recordsthisweek, setRecordsthisweek] = useState(props.chart.chartDataUser.records_thisweek); 
+    console.log(recordsthisweek); 
+    
+    const [mylabels, setMylabels] = useState(["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli","Agustus","September","Oktober","November","Desember"]); 
+    const [myincome, setMyincome] = useState([
+        Math.random() * 1000,
+        Math.random() * 10000,
+        Math.random() * 100000,
+        Math.random() * 10000,
+        Math.random() * 1000,
+        Math.random() * 1000,
+        Math.random() * 1000000,
+        Math.random() * 1000,
+        Math.random() * 10000,
+        Math.random() * 1000,
+        Math.random() * 10000,
+        Math.random() * 9000000
+    ]); 
+    const mydatasets = [{ data: myincome }];
+    wait(1000).then(()=>{
+        setMyincome(props.chart.chartDataUser.myChart_income);
+    });
+  
     const [item, setItem] = useState(props.route.params.item);
     const {navigate} = props.navigation;
     const [visible, setVisible] = useState(false); 
@@ -18,7 +46,7 @@ function ProfileScreen(props) {
     
     toggleOverlay = () => {
       setVisible(!visible);
-    }; 
+    };  
 
     const handleTakePhoto = () => {
         toggleOverlay();
@@ -53,6 +81,15 @@ function ProfileScreen(props) {
     const handleUploadPhoto = async() => {
         console.log(photo);
         
+    }
+
+    const countTotal =(data)=>{
+        let total = 0;
+        total= data.reduce(function(prev, cur) {
+          return prev + cur.total;
+        }, 0);
+      
+        return total;
     }
 
     return(
@@ -140,9 +177,9 @@ function ProfileScreen(props) {
                 <Text style={{ fontWeight:'bold',color:'#666'}}>Point Of Sales</Text>
             </View>
             <View style={{flexDirection:'row', justifyContent:'space-around', paddingHorizontal:10, paddingVertical:10, borderTopWidth:0 }}>
-                <View style={{minHeight:50, minWidth:60, backgroundColor:'purple', borderWidth:2, borderRadius:10, borderColor:'purple', margin:10,alignItems:'center', justifyContent:'center', flexDirection:'column', padding:5}}><Text style={{color:'#fff', fontWeight:'bold', fontSize:20}}>Rp.10.000</Text><Text style={{color:'#fff'}}>Today</Text></View>
-                <View style={{minHeight:50, minWidth:60, backgroundColor:'green', borderWidth:2, borderRadius:10, borderColor:'green', margin:10,alignItems:'center', justifyContent:'center', flexDirection:'column', padding:5}}><Text style={{color:'#fff', fontWeight:'bold', fontSize:20}}>Rp.70.000</Text><Text style={{color:'#fff'}}>Week</Text></View>
-                <View style={{minHeight:50, minWidth:60, backgroundColor:'orange', borderWidth:2, borderRadius:10, borderColor:'orange', margin:10,alignItems:'center', justifyContent:'center', flexDirection:'column', padding:5}}><Text style={{color:'#fff', fontWeight:'bold', fontSize:20}}>Rp.2.100.000</Text><Text style={{color:'#fff'}}>Month</Text></View>
+                <View style={{minHeight:50, minWidth:60, backgroundColor:'purple', borderWidth:2, borderRadius:10, borderColor:'purple', margin:10,alignItems:'center', justifyContent:'center', flexDirection:'column', padding:5}}><Text style={{color:'#fff', fontWeight:'bold', fontSize:20}}>{formatNumber(myincome_today)}</Text><Text style={{color:'#fff'}}>Today</Text></View>
+                <View style={{minHeight:50, minWidth:60, backgroundColor:'green', borderWidth:2, borderRadius:10, borderColor:'green', margin:10,alignItems:'center', justifyContent:'center', flexDirection:'column', padding:5}}><Text style={{color:'#fff', fontWeight:'bold', fontSize:20}}>{formatNumber(myincome_week)}</Text><Text style={{color:'#fff'}}>Week</Text></View>
+                <View style={{minHeight:50, minWidth:60, backgroundColor:'orange', borderWidth:2, borderRadius:10, borderColor:'orange', margin:10,alignItems:'center', justifyContent:'center', flexDirection:'column', padding:5}}><Text style={{color:'#fff', fontWeight:'bold', fontSize:20}}>{formatNumber(myincome_month)}</Text><Text style={{color:'#fff'}}>Month</Text></View>
             </View>
         </View>
         <View style={{marginBottom:10,marginHorizontal:10,borderWidth:1,borderColor:'#666',borderRadius:16,zIndex:100, flexDirection:'column', justifyContent:'space-between', paddingVertical:5, backgroundColor:'#FFF'}}>
@@ -151,19 +188,8 @@ function ProfileScreen(props) {
             </View>
             <LineChart
                 data={{
-                labels: ["Januari", "Februari", "Maret", "April", "Mei", "Juni"],
-                datasets: [
-                    {
-                    data: [
-                        Math.random() * 100,
-                        Math.random() * 100,
-                        Math.random() * 100,
-                        Math.random() * 100,
-                        Math.random() * 100,
-                        Math.random() * 100
-                    ]
-                    }
-                ]
+                labels: mylabels,
+                datasets: mydatasets
                 }}
                 width={Dimensions.get("window").width - 100} // from react-native
                 height={200}
@@ -188,6 +214,40 @@ function ProfileScreen(props) {
                 borderRadius: 16
                 }}
             />
+        </View>
+        <View style={{marginBottom:10,marginHorizontal:10,borderWidth:1,borderColor:'#666',borderRadius:16,zIndex:100, flexDirection:'column', justifyContent:'space-between', paddingVertical:5, backgroundColor:'#FFF'}}>
+            <View style={{alignSelf:'center', alignItems:'center',justifyContent: 'center',}}>
+                <Text style={{ fontWeight:'bold',color:'#666'}}>Records</Text>
+            </View>
+            
+            <View style={{flexDirection:'column', justifyContent:'space-around', paddingHorizontal:10, paddingVertical:10, borderTopWidth:0 }}>
+                <View style={{flex:1, flexDirection:'row', justifyContent:'space-around', paddingHorizontal:10, paddingVertical:10, borderTopWidth:1}}>
+                    <Text style={{fontWeight:'bold', color:'grey'}}>{'Date'}</Text>
+                    <Text style={{fontWeight:'bold', color:'grey'}}>{'No_Trx'}</Text>
+                    <Text style={{fontWeight:'bold', color:'grey'}}>{'Income'}</Text>
+                </View>
+                {recordsthisweek.length === 0 || recordsthisweek.length === undefined ? (
+                    <View style={{flex:1, flexDirection:'row', justifyContent:'space-around', paddingHorizontal:10, paddingVertical:10, borderTopWidth:0}}>
+                        <Text style={{fontWeight:'bold', color:'grey'}}>{'Belum ada transaksi'}</Text> 
+                    </View>
+                ):(
+                    <>
+                    {recordsthisweek.map((tr, index)=>(
+                        <View key={index} style={{flex:1, flexDirection:'row', justifyContent:'space-around', paddingHorizontal:10, paddingVertical:10, borderTopWidth:0}}>
+                            <Text>{tr.tanggal}</Text>
+                            <Text>{tr.no_transaction}</Text>
+                            <Text>{formatNumber(tr.total)}</Text>
+                        </View>
+                    ))}  
+                        <View style={{flex:1, flexDirection:'row', justifyContent:'space-around', paddingHorizontal:10, paddingVertical:10, borderTopWidth:1}}>
+                            <Text style={{fontWeight:'bold', color:'grey'}}>{'Record: '+recordsthisweek.length}</Text>
+                            <Text style={{fontWeight:'bold', color:'grey'}}>{'Count'}</Text>
+                            <Text style={{fontWeight:'bold', color:'grey'}}>{formatNumber(countTotal(recordsthisweek))}</Text>
+                        </View>
+                    </>
+                )}
+            
+            </View>
         </View>
         </ScrollView>
         <Overlay 
@@ -218,7 +278,16 @@ function ProfileScreen(props) {
     ) 
 }
 
-export default ProfileScreen;
+const mapStateToProps =(state)=>{
+    const { user, product, checkout, chart } = state
+    return{
+      user, 
+      chart
+    }
+  }
+   
+export default connect(mapStateToProps)(ProfileScreen);
+// export default ProfileScreen;
 
 const styles = StyleSheet.create({
     container: {

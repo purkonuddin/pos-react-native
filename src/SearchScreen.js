@@ -44,9 +44,6 @@ function SearchScreen(props) {
                 'Content-Type': 'application/json', 
               }
             });
-            console.log('@chart : ', chart.data);
-            
-
         }
     }
 

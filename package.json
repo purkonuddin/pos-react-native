@@ -16,7 +16,7 @@
     "@react-navigation/stack": "^5.2.9",
     "babel-preset-react-native": "^4.0.1",
     "glamorous-native": "^2.0.0",
-    "qs": "^6.9.3",
+    "qs": "^6.9.7",
     "react": "16.11.0",
     "react-native": "0.62.1",
     "react-native-axios": "^0.17.1",
